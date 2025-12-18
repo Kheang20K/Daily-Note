@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.myapp.dailynote.data.model.SubTaskUi
 import com.myapp.dailynote.ui.component.DueDate
+import com.myapp.dailynote.ui.component.Reminder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,6 +162,8 @@ fun AddScreen(
             }
             Spacer(Modifier.height(12.dp))
             DueDate()
+            Spacer(Modifier.height(12.dp))
+            Reminder()
             if (showDialog){
                 DialogInput(
                     onDismissRequest = {
@@ -243,7 +246,3 @@ fun DialogInput(
     )
 }
 
-@Preview
-@Composable
-fun AddScreenPreview(){
-}

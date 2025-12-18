@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.myapp.dailynote.data.database.NoteDao
 import com.myapp.dailynote.data.database.NoteDatabase
+import com.myapp.dailynote.data.reminder_db.ReminderDao
+import com.myapp.dailynote.data.reminder_db.ReminderDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,8 +30,25 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
+    fun provideReminderDataBase(
+        @ApplicationContext context: Context
+    ): ReminderDataBase{
+        return Room.databaseBuilder(
+            context,
+            ReminderDataBase::class.java,
+            "reminder_Db"
+        ).build()
+    }
+
+    @Provides
     fun provideDao(db: NoteDatabase): NoteDao{
         return db.userDao()
     }
+    @Provides
+    fun provideReminderDao(db: ReminderDataBase): ReminderDao {
+        return db.reminderDao()
+    }
+
 
 }

@@ -64,7 +64,7 @@ fun DueDate(
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
         Row (
             modifier = Modifier
@@ -82,7 +82,7 @@ fun DueDate(
                 modifier = Modifier
                     .size(28.dp)
             )
-            Spacer(Modifier.width(2.dp))
+            Spacer(Modifier.width(6.dp))
             Text(
                 text = textShowDate ?:"Set Due Date",
                 fontSize = 16.sp,
@@ -108,7 +108,7 @@ fun DueDate(
                 modifier = Modifier
                     .size(28.dp)
             )
-            Spacer(Modifier.width(2.dp))
+            Spacer(Modifier.width(6.dp))
             Text(
                 text = selectionTime ?:"Set Time",
                 fontSize = 16.sp,
@@ -144,94 +144,8 @@ fun DueDate(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePicker(
-    onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit
-){
-    val datePickerState = rememberDatePickerState()
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDateSelected(datePickerState.selectedDateMillis)
-                    onDismiss()
-                }
-            ) {
-                Text("OK")
-            }
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            DatePicker(
-                state = datePickerState
-            )
-        }
-    }
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimePicker(
-    onTimeSelected: (Int,Int) -> Unit,
-    onDismiss: () -> Unit
-){
-    val timePickerState = rememberTimePickerState()
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onTimeSelected(timePickerState.hour,timePickerState.minute)
-                    onDismiss()
-                }
-            ) {
-                Text("OK")
-            }
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Select Time",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TimePicker(
-                state = timePickerState
-            )
-        }
-    }
-}
-
-fun formatDate(millis : Long): String{
-    val formatter = SimpleDateFormat("dd-MMM-yyyy", java.util.Locale.getDefault())
-    return formatter.format(Date(millis))
-
-}
-fun formatTime(hour: Int, minute: Int): String?{
-    val calender = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY,hour)
-        set(Calendar.MINUTE,minute)
-    }
-    val formatter = SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
-    return formatter.format(calender.time)
-}
 
 @Preview
 @Composable
