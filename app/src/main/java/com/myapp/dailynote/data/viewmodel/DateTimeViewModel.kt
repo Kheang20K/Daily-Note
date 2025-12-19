@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.myapp.dailynote.data.entities.ReminderEntity
 import com.myapp.dailynote.data.repository.ReminderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,9 +34,9 @@ class DateTimeViewModel @Inject constructor  (
         val triggerTimeMillis = calendar.timeInMillis
         viewModelScope.launch {
             repository.saveScheduleReminder(
-                title = title,
-                message = message,
-                triggerTimeMillis = triggerTimeMillis
+                title,
+                message,
+                triggerTimeMillis
             )
         }
     }

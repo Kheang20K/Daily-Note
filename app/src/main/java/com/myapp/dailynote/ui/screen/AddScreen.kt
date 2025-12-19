@@ -24,10 +24,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,12 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.myapp.dailynote.data.database.NoteDataUser
+import com.myapp.dailynote.data.entities.NoteDataUser
 import com.myapp.dailynote.data.model.SubTaskUi
 import com.myapp.dailynote.data.viewmodel.DateTimeViewModel
 import com.myapp.dailynote.data.viewmodel.NoteViewModel
@@ -56,11 +55,12 @@ import com.myapp.dailynote.ui.component.formatTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-    viewModel: NoteViewModel = hiltViewModel(),
+    noteViewModel: NoteViewModel = hiltViewModel(),
     dateViewModel: DateTimeViewModel = hiltViewModel(),
     todoTextFromDb: String? = null,
     navController: NavController
 ){
+    val note by noteViewModel.notes.collectAsState()
     var todoText by remember { mutableStateOf(todoTextFromDb ?:"") }
     val isEditing = todoTextFromDb != null
 
@@ -98,8 +98,9 @@ fun AddScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.insertNote(
-                        NoteDataUser(
+                    if (todoText.isNotBlank()) {
+                        // 1️⃣ Create the note inside the if-block
+                        val note = NoteDataUser(
                             title = todoText,
                             content = todoText,
                             date = reminderDetailMillis?.let { formatDate(it) } ?: "",
@@ -107,15 +108,20 @@ fun AddScreen(
                                 formatTime(reminderHour!!, reminderMinute!!)
                             else ""
                         )
-                    )
-                    if (reminderDetailMillis != null && reminderHour != null && reminderMinute != null){
-                        dateViewModel.saveReminder(
-                            dateMillis = reminderDetailMillis!!,
-                            hour = reminderHour!!,
-                            minute = reminderMinute!!,
-                            title = todoText,
-                            message = todoText
-                        )
+
+                        // 2️⃣ Insert the note
+                        noteViewModel.insertNote(note = note)
+
+                        // 3️⃣ Optionally save the reminder
+                        if (reminderDetailMillis != null && reminderHour != null && reminderMinute != null) {
+                            dateViewModel.saveReminder(
+                                dateMillis = reminderDetailMillis!!,
+                                hour = reminderHour!!,
+                                minute = reminderMinute!!,
+                                title = todoText,
+                                message = todoText
+                            )
+                        }
                     }
                     navController.popBackStack()
                     Log.d("addscreen","${todoText}")

@@ -3,8 +3,8 @@ package com.myapp.dailynote.data.repository
 import android.Manifest
 import android.annotation.SuppressLint
 import androidx.annotation.RequiresPermission
-import com.myapp.dailynote.data.reminder_db.ReminderDao
-import com.myapp.dailynote.data.reminder_db.ReminderEntity
+import com.myapp.dailynote.data.database.ReminderDao
+import com.myapp.dailynote.data.entities.ReminderEntity
 import com.myapp.dailynote.data.reminder_scheduler.ReminderScheduler
 import javax.inject.Inject
 import kotlin.math.max
@@ -34,4 +34,5 @@ class ReminderRepository @Inject constructor(
             triggerTimeMillis = triggerTimeMillis,
         )
     }
+    fun getAllReminders()= dao.getReminders()
 }

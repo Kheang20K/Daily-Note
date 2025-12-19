@@ -1,7 +1,7 @@
 package com.myapp.dailynote.data.repository
 
 import com.myapp.dailynote.data.database.NoteDao
-import com.myapp.dailynote.data.database.NoteDataUser
+import com.myapp.dailynote.data.entities.NoteDataUser
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

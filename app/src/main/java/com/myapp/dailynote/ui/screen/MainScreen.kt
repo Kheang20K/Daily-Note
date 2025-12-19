@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.myapp.dailynote.data.database.NoteDataUser
+import com.myapp.dailynote.data.entities.NoteDataUser
 import com.myapp.dailynote.data.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,12 +83,10 @@ fun MainScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Spacer(Modifier.height(12.dp))
-            Text("Notes")
 
             LazyColumn {
                 items(notes){note ->
                     Text(note.title)
-                    Text(note.content)
                 }
             }
         }

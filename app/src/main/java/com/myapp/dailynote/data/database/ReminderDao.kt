@@ -1,4 +1,4 @@
-package com.myapp.dailynote.data.reminder_db
+package com.myapp.dailynote.data.database
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.myapp.dailynote.data.entities.ReminderEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
