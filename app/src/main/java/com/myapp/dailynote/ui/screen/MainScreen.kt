@@ -76,95 +76,12 @@ fun MainScreen(
         floatingActionButtonPosition = FabPosition.End
     ){ innerPadding ->
 
-//        Box(
-//            modifier = Modifier
-//                .padding(innerPadding)
-//                .fillMaxSize()
-//        ){
-//
-//        }
-//
-//        if (showSheet){
-//            ModalBottomSheet(
-//                sheetState = sheetState,
-//                onDismissRequest = {
-//                    showSheet = false
-//                    title = ""
-//                },
-//            ) {
-//                Column (
-//                    modifier = Modifier
-//                        .fillMaxHeight(1f)
-//                ){
-//                    Column (
-//                        modifier = Modifier
-//                            .fillMaxSize(),
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-//                        TextField(
-//                            value = title,
-//                            onValueChange = {title = it},
-//                            placeholder = { Text("Enter Title") }
-//                        )
-//                        TextField(
-//                            value = context,
-//                            onValueChange = {context = it},
-//                            placeholder = { Text("Enter Content") }
-//                        )
-//                        Spacer(Modifier.height(12.dp))
-//                        Button(
-//                            onClick = {
-//                                val note = NoteDataUser(
-//                                    title = title,
-//                                    content = context,
-//                                    date = "now",
-//                                    time ="now",
-//                                )
-//                                viewModel.insertNote(note)
-//                                title = ""
-//                                context = ""
-//                            }
-//                        ) {
-//                            Text("Save")
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-
         Column (
             modifier = Modifier
                 .padding(16.dp)
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-//            TextField(
-//                value = title,
-//                onValueChange = {title = it},
-//                placeholder = { Text("Enter Title") }
-//            )
-//            TextField(
-//                value = context,
-//                onValueChange = {context = it},
-//                placeholder = { Text("Enter Content") }
-//            )
-//            Spacer(Modifier.height(12.dp))
-//            Button(
-//                onClick = {
-//                    val note = NoteDataUser(
-//                        title = title,
-//                        content = context,
-//                        date = "now",
-//                        time ="now",
-//                    )
-//                    viewModel.insertNote(note)
-//                    title = ""
-//                    context = ""
-//                }
-//            ) {
-//                Text("Save")
-//            }
             Spacer(Modifier.height(12.dp))
             Text("Notes")
 

@@ -32,7 +32,8 @@ import com.myapp.dailynote.data.viewmodel.DateTimeViewModel
 
 @Composable
 fun Reminder(
-    viewModel: DateTimeViewModel = hiltViewModel()
+    viewModel: DateTimeViewModel = hiltViewModel(),
+    onDateTimeSelected: (Long,Int,Int) -> Unit
 ){
     var showDate by remember { mutableStateOf(false) }
     var showTime by remember { mutableStateOf(false) }
