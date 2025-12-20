@@ -1,8 +1,10 @@
 package com.myapp.dailynote.ui.screen
 
 import android.graphics.drawable.Icon
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -36,8 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.myapp.dailynote.data.database.NoteDataUser
+import com.myapp.dailynote.data.entities.NoteDataUser
 import com.myapp.dailynote.data.viewmodel.NoteViewModel
+import com.myapp.dailynote.ui.component.UiListTodo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +51,7 @@ fun MainScreen(
     val notes by viewModel.notes.collectAsState()
     var title by remember { mutableStateOf("") }
     var context by remember { mutableStateOf("") }
+    var isChecked by remember { mutableStateOf(false) }
 
     //sheetState
     val sheetState = rememberModalBottomSheetState ()
@@ -76,102 +80,32 @@ fun MainScreen(
         floatingActionButtonPosition = FabPosition.End
     ){ innerPadding ->
 
-//        Box(
-//            modifier = Modifier
-//                .padding(innerPadding)
-//                .fillMaxSize()
-//        ){
-//
-//        }
-//
-//        if (showSheet){
-//            ModalBottomSheet(
-//                sheetState = sheetState,
-//                onDismissRequest = {
-//                    showSheet = false
-//                    title = ""
-//                },
-//            ) {
-//                Column (
-//                    modifier = Modifier
-//                        .fillMaxHeight(1f)
-//                ){
-//                    Column (
-//                        modifier = Modifier
-//                            .fillMaxSize(),
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-//                        TextField(
-//                            value = title,
-//                            onValueChange = {title = it},
-//                            placeholder = { Text("Enter Title") }
-//                        )
-//                        TextField(
-//                            value = context,
-//                            onValueChange = {context = it},
-//                            placeholder = { Text("Enter Content") }
-//                        )
-//                        Spacer(Modifier.height(12.dp))
-//                        Button(
-//                            onClick = {
-//                                val note = NoteDataUser(
-//                                    title = title,
-//                                    content = context,
-//                                    date = "now",
-//                                    time ="now",
-//                                )
-//                                viewModel.insertNote(note)
-//                                title = ""
-//                                context = ""
-//                            }
-//                        ) {
-//                            Text("Save")
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-
         Column (
             modifier = Modifier
                 .padding(16.dp)
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-//            TextField(
-//                value = title,
-//                onValueChange = {title = it},
-//                placeholder = { Text("Enter Title") }
-//            )
-//            TextField(
-//                value = context,
-//                onValueChange = {context = it},
-//                placeholder = { Text("Enter Content") }
-//            )
-//            Spacer(Modifier.height(12.dp))
-//            Button(
-//                onClick = {
-//                    val note = NoteDataUser(
-//                        title = title,
-//                        content = context,
-//                        date = "now",
-//                        time ="now",
-//                    )
-//                    viewModel.insertNote(note)
-//                    title = ""
-//                    context = ""
-//                }
-//            ) {
-//                Text("Save")
-//            }
             Spacer(Modifier.height(12.dp))
-            Text("Notes")
 
-            LazyColumn {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(
+                    top = 8.dp,
+                    bottom = 16.dp
+                )
+            ) {
                 items(notes){note ->
-                    Text(note.title)
-                    Text(note.content)
+                    UiListTodo(
+                        title = note.title,
+                        checkBox = note.isDone,
+                        onCheckChange = {checked ->
+                            viewModel.upDateNote(note.copy(isDone = checked))
+                        },
+                        onClick = {
+                            navController.navigate("add_screen/${note.id}")
+                        }
+                    )
                 }
             }
         }

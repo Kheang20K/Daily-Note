@@ -1,4 +1,4 @@
-package com.myapp.dailynote.data.database
+package com.myapp.dailynote.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,5 +9,6 @@ data class NoteDataUser(
     val title: String,
     val content: String,
     val date: String,
-    val time: String
+    val time: String,
+    val isDone: Boolean =false
 )
