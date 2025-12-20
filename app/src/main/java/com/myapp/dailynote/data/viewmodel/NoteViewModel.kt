@@ -42,5 +42,10 @@ class NoteViewModel @Inject constructor(
             repository.insert(note)
         }
     }
+    fun upDateNote(note: NoteDataUser){
+        viewModelScope.launch {
+            repository.upDateNote(note)
+        }
+    }
 
 }

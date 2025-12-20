@@ -12,6 +12,9 @@ class RepoDb @Inject constructor(
     suspend fun insert(note: NoteDataUser) {
         noteDao.insertNote(note)
     }
+    suspend fun upDateNote(note: NoteDataUser){
+        noteDao.updateNote(note)
+    }
     suspend fun delete(note: NoteDataUser) {
         noteDao.noteDelete(note)
     }

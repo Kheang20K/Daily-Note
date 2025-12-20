@@ -9,5 +9,6 @@ data class NoteDataUser(
     val title: String,
     val content: String,
     val date: String,
-    val time: String
+    val time: String,
+    val isDone: Boolean =false
 )

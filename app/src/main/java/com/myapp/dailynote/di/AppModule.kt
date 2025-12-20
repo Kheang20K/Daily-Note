@@ -25,7 +25,9 @@ object AppModule {
             context,
             NoteDatabase::class.java,
             "daily_note_db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

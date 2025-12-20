@@ -1,6 +1,8 @@
 package com.myapp.dailynote.ui.screen
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -57,12 +60,15 @@ import com.myapp.dailynote.ui.component.formatTime
 fun AddScreen(
     noteViewModel: NoteViewModel = hiltViewModel(),
     dateViewModel: DateTimeViewModel = hiltViewModel(),
+    noteId: Int? = null,
     todoTextFromDb: String? = null,
     navController: NavController
 ){
     val note by noteViewModel.notes.collectAsState()
-    var todoText by remember { mutableStateOf(todoTextFromDb ?:"") }
-    val isEditing = todoTextFromDb != null
+    val noteToEdit = note.find { it.id == noteId }
+    val isEditing = noteToEdit != null
+    var todoText by remember { mutableStateOf(noteToEdit?.title ?: todoTextFromDb ?: "") }
+
 
     var showDialog by remember { mutableStateOf(false) }
     var subtask by remember { mutableStateOf("") }
@@ -72,6 +78,7 @@ fun AddScreen(
     var reminderDetailMillis by remember { mutableStateOf<Long?>(null) }
     var reminderHour by remember { mutableStateOf<Int?>(null) }
     var reminderMinute by remember { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
 
     Scaffold (
         topBar = {
@@ -99,20 +106,27 @@ fun AddScreen(
             FloatingActionButton(
                 onClick = {
                     if (todoText.isNotBlank()) {
-                        // 1️⃣ Create the note inside the if-block
-                        val note = NoteDataUser(
-                            title = todoText,
-                            content = todoText,
-                            date = reminderDetailMillis?.let { formatDate(it) } ?: "",
-                            time = if (reminderHour != null && reminderMinute != null)
-                                formatTime(reminderHour!!, reminderMinute!!)
-                            else ""
-                        )
-
-                        // 2️⃣ Insert the note
-                        noteViewModel.insertNote(note = note)
-
-                        // 3️⃣ Optionally save the reminder
+                        if (noteToEdit != null){
+                            val updateNote = NoteDataUser(
+                                title = todoText,
+                                content = todoText,
+                                date = reminderDetailMillis?.let { formatDate(it) } ?: "",
+                                time = if (reminderHour != null && reminderMinute != null)
+                                    formatTime(reminderHour!!, reminderMinute!!)
+                                else ""
+                            )
+                            noteViewModel.insertNote(note = updateNote)
+                        }else{
+                            val newNote = NoteDataUser(
+                                title = todoText,
+                                content = todoText,
+                                date = reminderDetailMillis?.let { formatDate(it) } ?: "",
+                                time = if (reminderHour != null && reminderMinute != null)
+                                    formatTime(reminderHour!!, reminderMinute!!)
+                                else ""
+                            )
+                            noteViewModel.insertNote(note = newNote)
+                        }
                         if (reminderDetailMillis != null && reminderHour != null && reminderMinute != null) {
                             dateViewModel.saveReminder(
                                 dateMillis = reminderDetailMillis!!,
@@ -124,7 +138,7 @@ fun AddScreen(
                         }
                     }
                     navController.popBackStack()
-                    Log.d("addscreen","${todoText}")
+                    Toast.makeText(context,"Your Activity is Save!!", Toast.LENGTH_LONG).show()
                 }
             ) {
                 Icon(
@@ -185,7 +199,6 @@ fun AddScreen(
 
                             fontSize = 16.sp
                         )
-
                     )
                 }
             }

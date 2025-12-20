@@ -1,8 +1,10 @@
 package com.myapp.dailynote.ui.screen
 
 import android.graphics.drawable.Icon
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -38,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.myapp.dailynote.data.entities.NoteDataUser
 import com.myapp.dailynote.data.viewmodel.NoteViewModel
+import com.myapp.dailynote.ui.component.UiListTodo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +51,7 @@ fun MainScreen(
     val notes by viewModel.notes.collectAsState()
     var title by remember { mutableStateOf("") }
     var context by remember { mutableStateOf("") }
+    var isChecked by remember { mutableStateOf(false) }
 
     //sheetState
     val sheetState = rememberModalBottomSheetState ()
@@ -84,9 +88,24 @@ fun MainScreen(
         ){
             Spacer(Modifier.height(12.dp))
 
-            LazyColumn {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(
+                    top = 8.dp,
+                    bottom = 16.dp
+                )
+            ) {
                 items(notes){note ->
-                    Text(note.title)
+                    UiListTodo(
+                        title = note.title,
+                        checkBox = note.isDone,
+                        onCheckChange = {checked ->
+                            viewModel.upDateNote(note.copy(isDone = checked))
+                        },
+                        onClick = {
+                            navController.navigate("add_screen/${note.id}")
+                        }
+                    )
                 }
             }
         }
