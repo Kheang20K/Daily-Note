@@ -1,7 +1,5 @@
 package com.myapp.dailynote.ui.screen
 
-import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,10 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -29,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -50,6 +48,7 @@ import com.myapp.dailynote.data.entities.NoteDataUser
 import com.myapp.dailynote.data.model.SubTaskUi
 import com.myapp.dailynote.data.viewmodel.DateTimeViewModel
 import com.myapp.dailynote.data.viewmodel.NoteViewModel
+import com.myapp.dailynote.ui.component.DialogInput
 import com.myapp.dailynote.ui.component.DueDate
 import com.myapp.dailynote.ui.component.Reminder
 import com.myapp.dailynote.ui.component.formatDate
@@ -60,44 +59,47 @@ import com.myapp.dailynote.ui.component.formatTime
 fun AddScreen(
     noteViewModel: NoteViewModel = hiltViewModel(),
     dateViewModel: DateTimeViewModel = hiltViewModel(),
-    noteId: Int? = null,
-    todoTextFromDb: String? = null,
+    noteId: Int?,
     navController: NavController
 ){
-    val note by noteViewModel.notes.collectAsState()
-    val noteToEdit = note.find { it.id == noteId }
+    val noteList by noteViewModel.notes.collectAsState()
+    val noteToEdit = noteId?.let { id -> noteList.find { it.id == id } }
     val isEditing = noteToEdit != null
-    var todoText by remember { mutableStateOf(noteToEdit?.title ?: todoTextFromDb ?: "") }
 
-
-    var showDialog by remember { mutableStateOf(false) }
+    var todoText by remember { mutableStateOf("") }
     var subtask by remember { mutableStateOf("") }
-
     val subtasks = remember { mutableStateListOf<SubTaskUi>() }
 
-    var reminderDetailMillis by remember { mutableStateOf<Long?>(null) }
+    var dueDateMillis by remember { mutableStateOf<Long?>(null) }
+    var dueHour by remember { mutableStateOf<Int?>(null) }
+    var dueMinute by remember { mutableStateOf<Int?>(null) }
+    var reminderMillis by remember { mutableStateOf<Long?>(null) }
     var reminderHour by remember { mutableStateOf<Int?>(null) }
     var reminderMinute by remember { mutableStateOf<Int?>(null) }
+
+    var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    Scaffold (
+    LaunchedEffect(noteToEdit) {
+        noteToEdit?.let { note ->
+            todoText = note.title
+            subtasks.clear()
+            subtasks.addAll(note.subtasks ?: emptyList())
+            dueDateMillis = note.dueDateMillis
+            dueHour = note.dueHour
+            dueMinute = note.dueMinute
+            reminderMillis = note.reminderDateMillis
+            reminderHour = note.reminderHour
+            reminderMinute = note.reminderMinute
+        }
+    }
+    Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(if (isEditing) "Edit Task" else "Create Task")
-                },
+                title = { Text(if (isEditing) "Edit Task" else "Create Task") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription = "back",
-                            modifier = Modifier
-                                .size(34.dp)
-                        )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "back", modifier = Modifier.size(34.dp))
                     }
                 }
             )
@@ -106,120 +108,116 @@ fun AddScreen(
             FloatingActionButton(
                 onClick = {
                     if (todoText.isNotBlank()) {
-                        if (noteToEdit != null){
-                            val updateNote = NoteDataUser(
+                        if (noteToEdit != null) {
+                            // Update existing note
+                            val updatedNote = noteToEdit.copy(
                                 title = todoText,
                                 content = todoText,
-                                date = reminderDetailMillis?.let { formatDate(it) } ?: "",
+                                subtasks = subtasks.toList(),
+                                dueDateMillis = dueDateMillis,
+                                dueHour = dueHour,
+                                dueMinute = dueMinute,
+                                reminderDateMillis = reminderMillis,
+                                reminderHour = reminderHour,
+                                reminderMinute = reminderMinute,
+                                date = reminderMillis?.let { formatDate(it) } ?: noteToEdit.date,
                                 time = if (reminderHour != null && reminderMinute != null)
                                     formatTime(reminderHour!!, reminderMinute!!)
-                                else ""
+                                else noteToEdit.time
                             )
-                            noteViewModel.insertNote(note = updateNote)
-                        }else{
+                            noteViewModel.upDateNote(updatedNote)
+                        } else {
                             val newNote = NoteDataUser(
                                 title = todoText,
                                 content = todoText,
-                                date = reminderDetailMillis?.let { formatDate(it) } ?: "",
+                                subtasks = subtasks.toList(),
+                                dueDateMillis = dueDateMillis,
+                                dueHour = dueHour,
+                                dueMinute = dueMinute,
+                                reminderDateMillis = reminderMillis,
+                                reminderHour = reminderHour,
+                                reminderMinute = reminderMinute,
+                                date = reminderMillis?.let { formatDate(it) } ?: "",
                                 time = if (reminderHour != null && reminderMinute != null)
                                     formatTime(reminderHour!!, reminderMinute!!)
                                 else ""
                             )
-                            noteViewModel.insertNote(note = newNote)
+                            noteViewModel.insertNote(newNote)
                         }
-                        if (reminderDetailMillis != null && reminderHour != null && reminderMinute != null) {
+                        if (reminderMillis != null && reminderHour != null && reminderMinute != null) {
                             dateViewModel.saveReminder(
-                                dateMillis = reminderDetailMillis!!,
+                                dateMillis = reminderMillis!!,
                                 hour = reminderHour!!,
                                 minute = reminderMinute!!,
                                 title = todoText,
                                 message = todoText
                             )
                         }
+                        Toast.makeText(context, "Your Activity is saved!", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
                     }
-                    navController.popBackStack()
-                    Toast.makeText(context,"Your Activity is Save!!", Toast.LENGTH_LONG).show()
                 }
             ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "check",
-                    modifier = Modifier
-                        .size(28.dp)
-                )
+                Icon(Icons.Default.Check, contentDescription = "save", modifier = Modifier.size(28.dp))
             }
-
         }
-    ){innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(8.dp)
-        ){
+        ) {
             OutlinedTextField(
                 value = todoText,
-                onValueChange = {todoText = it},
+                onValueChange = { todoText = it },
                 label = { Text("What needs to be done?") },
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Subtasks",
+                "Subtasks",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
-            Spacer(Modifier.height(12.dp))
-            subtasks.forEachIndexed { index, task ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-
-                ){
-                    Checkbox(
-                        checked = task.isDone,
-                        onCheckedChange = { check->
-                            subtasks[index] = subtasks[index].copy(isDone = check)
-                        }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = task.title,
-                        style = TextStyle(
-                            textDecoration = if (task.isDone)
-                                TextDecoration.LineThrough
-                            else
-                                TextDecoration.None,
-
-                            color = if (task.isDone)
-                                Color.Black
-                            else
-                                Color.Black,
-
-                            fontSize = 16.sp
+            Spacer(modifier = Modifier.height(12.dp))
+            Column {
+                subtasks.forEachIndexed { index, task ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = task.isDone,
+                            onCheckedChange = { checked ->
+                                subtasks[index] = subtasks[index].copy(isDone = checked)
+                            }
                         )
-                    )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = task.title,
+                            style = TextStyle(
+                                textDecoration = if (task.isDone) TextDecoration.LineThrough else TextDecoration.None,
+                                fontSize = 16.sp,
+                                color = Color.Black
+                            )
+                        )
+                    }
                 }
             }
-            Spacer(Modifier.height(12.dp))
-            Row (
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(
-                        onClick = {
-                            showDialog = true
-                        }
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
-            ){
+                    .clickable { showDialog = true },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    Icons.Default.Add,
                     contentDescription = "add",
-                    modifier = Modifier
-                        .size(28.dp)
+                    modifier = Modifier.size(28.dp)
                 )
-                Spacer(Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     "Add Subtask",
                     fontSize = 16.sp,
@@ -227,17 +225,29 @@ fun AddScreen(
                     color = Color.Black
                 )
             }
-            Spacer(Modifier.height(12.dp))
-            DueDate()
-            Spacer(Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            DueDate(
+                selectedMillis = dueDateMillis,
+                selectedHour = dueHour,
+                selectedMinute = dueMinute,
+                onDateSelected = { dueDateMillis = it },
+                onTimeSelected = { hour, minute ->
+                    dueHour = hour
+                    dueMinute = minute
+                }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
             Reminder(
-                onDateTimeSelected = { dateMillis, hour, minute ->
-                    reminderDetailMillis = dateMillis
+                selectedMillis = reminderMillis,
+                selectedHour = reminderHour,
+                selectedMinute = reminderMinute,
+                onDateTimeSelected = { millis, hour, minute ->
+                    reminderMillis = millis
                     reminderHour = hour
                     reminderMinute = minute
                 }
             )
-            if (showDialog){
+            if (showDialog) {
                 DialogInput(
                     onDismissRequest = {
                         showDialog = false
@@ -245,16 +255,14 @@ fun AddScreen(
                     },
                     onConfirmation = {
                         if (subtask.isNotBlank()) {
-                            subtasks.add(
-                                SubTaskUi(title = subtask)
-                            )
+                            subtasks.add(SubTaskUi(title = subtask))
                         }
                         showDialog = false
                         subtask = ""
                     },
                     title = {
                         Text(
-                            text = "Add Subtask",
+                            "Add Subtask",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -264,58 +272,11 @@ fun AddScreen(
                             value = subtask,
                             onValueChange = { subtask = it },
                             placeholder = { Text("New Subtask") },
-                            modifier = Modifier
-                                .fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    },
+                    }
                 )
             }
         }
     }
 }
-@Composable
-fun DialogInput(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    title: @Composable () -> Unit,
-    textField: @Composable (() -> Unit),
-){
-    AlertDialog(
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        title = {
-            title()
-        },
-        text = {
-            textField()
-        },
-        dismissButton = {
-            Text(
-                text = "Cancel",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            onDismissRequest()
-                        }
-                    )
-            )
-        },
-        confirmButton = {
-            Text(
-                text = "Ok",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            onConfirmation()
-                        }
-                    )
-            )
-        }
-    )
-}
-

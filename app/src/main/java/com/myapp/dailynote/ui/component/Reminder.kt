@@ -9,119 +9,82 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.myapp.dailynote.R
-import com.myapp.dailynote.data.viewmodel.DateTimeViewModel
 
 @Composable
 fun Reminder(
-    viewModel: DateTimeViewModel = hiltViewModel(),
-    onDateTimeSelected: (Long,Int,Int) -> Unit
-){
+    selectedMillis: Long?,
+    selectedHour: Int?,
+    selectedMinute: Int?,
+    onDateTimeSelected: (Long, Int, Int) -> Unit
+) {
     var showDate by remember { mutableStateOf(false) }
     var showTime by remember { mutableStateOf(false) }
+    // Initialize displayed text from saved values
+    val textShowDate = remember(selectedMillis) {
+        selectedMillis?.let { formatDate(it) } ?: "Set Reminder"
+    }
+    val selectionTime = remember(selectedHour, selectedMinute) {
+        if (selectedHour != null && selectedMinute != null)
+            formatTime(selectedHour, selectedMinute)
+        else "Set Time"
+    }
+    var tempSelectedMillis by remember { mutableStateOf(selectedMillis) }
+    var tempHour by remember { mutableIntStateOf(selectedHour ?: 0) }
+    var tempMinute by remember { mutableIntStateOf(selectedMinute ?: 0) }
 
-    var textShowDate by remember { mutableStateOf<String?>(null) }
-    var selectionTime by remember { mutableStateOf<String?>(null) }
-
-    var selectedDateMillis by remember { mutableStateOf<Long?>(null) }
-    var selectedHour by remember { mutableStateOf(0) }
-    var selectedMinute by remember { mutableStateOf(0) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = "Reminder",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+    Column {
+        Text("Reminder", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
         Spacer(Modifier.height(12.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        showDate = true
-                    }
-                ),
-            verticalAlignment = Alignment.CenterVertically,
+                .clickable { showDate = true },
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Notifications,
-                contentDescription = "notifications",
-                modifier = Modifier
-                    .size(28.dp)
-            )
+            Icon(Icons.Default.Notifications, contentDescription = "reminder", modifier = Modifier.size(28.dp))
             Spacer(Modifier.width(6.dp))
-            Text(
-                text = if (textShowDate != null && selectionTime != null) {
-                    "$textShowDate $selectionTime"
-                } else {
-                    "Set Reminder"
-                },
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
+            Text("$textShowDate $selectionTime", fontSize = 16.sp)
         }
         Spacer(Modifier.height(12.dp))
-
         if (showDate) {
             DatePicker(
                 onDateSelected = { millis ->
                     millis?.let {
-                        textShowDate = formatDate(millis)
+                        tempSelectedMillis = it
                         showDate = false
                         showTime = true
                     }
-
                 },
-                onDismiss = {
-                    showDate = false
-                }
+                onDismiss = { showDate = false }
             )
         }
         if (showTime) {
             TimePicker(
                 onTimeSelected = { hour, minute ->
-                    selectionTime = formatTime(hour, minute)
-                    selectedHour = hour
-                    selectedMinute = minute
+                    tempHour = hour
+                    tempMinute = minute
                     showTime = false
 
-                    selectedDateMillis?.let { DateMillis ->
-                        viewModel.saveReminder(
-                            dateMillis = DateMillis,
-                            hour = selectedHour,
-                            minute = selectedMinute
-                        )
+                    tempSelectedMillis?.let { millis ->
+                        onDateTimeSelected(millis, tempHour, tempMinute)
                     }
-
                 },
-                onDismiss = {
-                    showTime = false
-
-                }
+                onDismiss = { showTime = false }
             )
         }
     }

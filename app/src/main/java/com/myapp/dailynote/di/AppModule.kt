@@ -26,7 +26,7 @@ object AppModule {
             NoteDatabase::class.java,
             "daily_note_db"
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(false)
             .build()
     }
 
