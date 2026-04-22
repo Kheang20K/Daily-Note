@@ -5,9 +5,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.myapp.dailynote.presentation.screen.detail.DetailEditScreen
+import com.myapp.dailynote.presentation.screen.detail.FocusScreen
 import com.myapp.dailynote.presentation.screen.detail.ManageCategoryScreen
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -42,6 +46,48 @@ fun AppNavigation() {
             }
         ) {
             ManageCategoryScreen(navController)
+        }
+
+        composable("detail_edit/{id}",
+            arguments = listOf(navArgument("id"){type = NavType.IntType}),
+            enterTransition = {
+                slideInHorizontally { it } + fadeIn()
+            },
+            exitTransition = {
+                slideOutHorizontally { -it } + fadeOut()
+
+            },
+
+            popEnterTransition = {
+                fadeIn()
+            },
+            popExitTransition = {
+                fadeOut()
+            }
+        ) {backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            DetailEditScreen(navController, id = id)
+        }
+
+        composable("focus_timer",
+            enterTransition = {
+                slideInHorizontally { it } + fadeIn()
+            },
+            exitTransition = {
+                slideOutHorizontally { -it } + fadeOut()
+
+            },
+
+            popEnterTransition = {
+                fadeIn()
+            },
+            popExitTransition = {
+                fadeOut()
+            }
+        ) {backStackEntry ->
+            FocusScreen(
+                navController
+            )
         }
 
     }

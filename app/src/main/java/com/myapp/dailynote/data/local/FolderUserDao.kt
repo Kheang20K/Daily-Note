@@ -1,7 +1,6 @@
 package com.myapp.dailynote.data.local
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -36,10 +35,17 @@ interface TodosDao{
     @Insert
     suspend fun insertTodo(todo : TodoEntity)
 
+    @Query("UPDATE todo SET title = :title ,dueDate= :dueDate WHERE id = :id")
+    suspend fun updateTodoTitle(id: Int,title: String,dueDate:Long?)
+
     @Query("DELETE FROM todo WHERE id = :id")
     suspend fun deleteTodoById(id: Int)
 
-    @Query("DELETE FROM todo WHERE folderId = :folderId")
-    suspend fun deleteTodosByFolderId(folderId: Int)
+    @Query("DELETE FROM todo WHERE folderId = :todoId")
+    suspend fun deleteTodosByFolderId(todoId: Int)
+    /*Set Count Timer*/
+    @Update
+    suspend fun updateTodo(todo: TodoEntity)
+
 
 }

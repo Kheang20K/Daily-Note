@@ -88,6 +88,8 @@ dependencies {
 //    animation navigation
     implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
 
+//    dataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 //    implementation("androidx.navigation:navigation-compose:2.7.7")
 //    implementation("androidx.compose.animation:animation")
 

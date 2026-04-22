@@ -12,12 +12,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,13 +30,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.myapp.dailynote.presentation.component.BottomSheet
 import com.myapp.dailynote.presentation.component.CardUserCategory
-import com.myapp.dailynote.presentation.screen.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageCategoryScreen(
     navController: NavController,
-    viewModel: ManageViewModel = hiltViewModel()
+    viewModel: AllDetailViewModel = hiltViewModel()
 ){
     var showBottomSheet by remember { mutableStateOf(false) }
     val folders by viewModel.folders.collectAsState()
@@ -44,7 +43,7 @@ fun ManageCategoryScreen(
 
     Scaffold (
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Create Task") },
                 navigationIcon = {
                     Icon(
@@ -88,7 +87,7 @@ fun ManageCategoryScreen(
                             textStart = folder.folderName,
                             color = folder.colorPicker,
                             onClick = {
-                                viewModel.deleteTodo(folder.folderId)
+                                viewModel.deleteCate(folder.folderId)
                             }
                         )
                         Spacer(Modifier.height(12.dp))

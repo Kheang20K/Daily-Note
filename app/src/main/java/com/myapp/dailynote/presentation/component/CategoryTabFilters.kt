@@ -2,7 +2,6 @@ package com.myapp.dailynote.presentation.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,15 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.myapp.dailynote.R
-import com.myapp.dailynote.presentation.screen.detail.ManageViewModel
+import com.myapp.dailynote.presentation.screen.detail.AllDetailViewModel
 import com.myapp.dailynote.presentation.screen.home.HomeViewModel
 
 data class filterItem(
@@ -45,7 +41,7 @@ data class filterItem(
 fun CategoryTabFilters(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
-    viewModelMange: ManageViewModel = hiltViewModel()
+    viewModelMange: AllDetailViewModel = hiltViewModel()
 
 ){
     val folder by viewModelMange.folders.collectAsState()
@@ -79,7 +75,9 @@ fun CategoryTabFilters(
                 }
             }
         }
-        Box (
+        Image(
+            painter = painterResource(id = R.drawable.ic_category),
+            contentDescription = "category_icon",
             modifier = Modifier
                 .weight(0.1f)
                 .height(26.dp)
@@ -88,24 +86,35 @@ fun CategoryTabFilters(
                         navController.navigate("manage_category")
                     }
                 )
-        ){
-            Row (
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Image(
-                    painter = painterResource(id = R.drawable.ic_category),
-                    contentDescription = "category_icon",
-                    modifier = Modifier
-                        .size(26.dp)
-                )
-            }
-
-        }
-
+        )
     }
+//        Box (
+//            modifier = Modifier
+//                .weight(0.1f)
+//                .height(26.dp)
+//                .clickable(
+//                    onClick = {
+//                        navController.navigate("manage_category")
+//                    }
+//                )
+//        ){
+//            Row (
+//                modifier = Modifier
+//                    .fillMaxSize(),
+////                horizontalArrangement = Arrangement.Center,
+////                verticalAlignment = Alignment.CenterVertically
+//            ){
+//                Image(
+//                    painter = painterResource(id = R.drawable.ic_category),
+//                    contentDescription = "category_icon",
+//                    modifier = Modifier
+//                        .size(26.dp)
+//                )
+//            }
+//
+//        }
+
+
 }
 
 @Composable

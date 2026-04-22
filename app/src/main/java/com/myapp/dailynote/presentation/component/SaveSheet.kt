@@ -30,9 +30,9 @@ fun SaveSheet(
     onSave : () -> Unit,
     iconClose: ImageVector,
     iconCorrect: ImageVector,
+    modifier: Modifier = Modifier,
     iconCloseColor: Color = Color.Black,
     iconSaveColor: Color = Color.Black,
-    modifier: Modifier = Modifier
 ){
     Row (
         modifier = modifier

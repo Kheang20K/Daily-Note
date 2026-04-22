@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.myapp.dailynote.R
-import com.myapp.dailynote.presentation.screen.detail.ManageViewModel
+import com.myapp.dailynote.presentation.screen.detail.AllDetailViewModel
 import com.myapp.dailynote.presentation.screen.home.HomeViewModel
 import kotlinx.coroutines.delay
 
@@ -38,7 +38,7 @@ fun BottomSheet(
     showBottomSheet: Boolean,
     onDismiss: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
-    viewModelMange: ManageViewModel = hiltViewModel()
+    viewModelMange: AllDetailViewModel = hiltViewModel()
 
 ){
     val sheetState = rememberModalBottomSheetState()
@@ -101,7 +101,7 @@ fun BottomSheet(
                     value = text,
                     onChangeValue = {text = it},
                     maxLength = 50,
-                    label = "Input your category"
+                    labelStr = "Input your category"
                 )
                 Spacer(Modifier.height(12.dp))
 

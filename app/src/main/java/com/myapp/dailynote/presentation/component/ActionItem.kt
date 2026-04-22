@@ -32,7 +32,8 @@ fun ActionsRow(
     progress: Float,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
-    onFavorite: () -> Unit
+    onFavorite: () -> Unit,
+    onFocus: () -> Unit,
 ) {
 
     val animationScale by animateFloatAsState(targetValue = progress)
@@ -56,28 +57,28 @@ fun ActionsRow(
             color = Color(0xFF75B2FA),
             icon = painterResource(R.drawable.ic_star),
             size = actionIconSize,
-            onClick = onDelete
+            onClick = onFavorite
         )
         Spacer(Modifier.width(8.dp))
         ActionItem(
             color = Color(0xFF0978F6),
             icon = painterResource(R.drawable.ic_date_range),
             size = actionIconSize,
-            onClick = onDelete
+            onClick = onEdit
         )
         Spacer(Modifier.width(8.dp))
         ActionItem(
             color = Color(0xFF0978F6),
             icon = painterResource(R.drawable.ic_sharp_timer),
             size = actionIconSize,
-            onClick = onEdit
+            onClick = onFocus
         )
         Spacer(Modifier.width(8.dp))
         ActionItem(
             color = Color.Red,
             icon = painterResource(R.drawable.ic_delete),
             size = actionIconSize,
-            onClick = onFavorite
+            onClick = {onDelete()}
         )
     }
 }

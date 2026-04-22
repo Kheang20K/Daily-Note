@@ -30,8 +30,9 @@ fun TextFieldCustom(
     value : String,
     onChangeValue: (String) -> Unit,
     maxLength: Int = 50,
-    label: String = "",
+    labelStr: String,
     modifier: Modifier = Modifier
+
 ){
 
     OutlinedTextField(
@@ -41,7 +42,7 @@ fun TextFieldCustom(
                 onChangeValue(it)
             }
         },
-        label = {Text("Input your category ")},
+        label = {Text(labelStr)},
         modifier = modifier.fillMaxWidth(),
         supportingText = {
             Row (modifier = modifier.fillMaxWidth()){

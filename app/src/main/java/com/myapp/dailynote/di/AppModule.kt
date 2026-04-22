@@ -3,6 +3,7 @@ package com.myapp.dailynote.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import com.myapp.dailynote.data.DataStoreInstance
 import com.myapp.dailynote.data.local.AppDataBase
 import dagger.Module
 import dagger.Provides
@@ -25,6 +26,7 @@ object AppModule {
             .fallbackToDestructiveMigration()
             .build()
     }
+
 
     @Provides
     @Singleton
